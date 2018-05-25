@@ -25,15 +25,19 @@ fn main() {
             
             if let MessageKind::Text {ref data, ..} = message.kind {
                 let index = data;
-                &message.reply_to_message.map(|message_or_post| {
-                    if let MessageOrChannelPost::Message(target_message) = *message_or_post {
-                        if let MessageKind::Text {ref data, ..} = target_message.kind {
-                            api.spawn(message.text_reply(
-                                format!("I am going to index \n{}\n in '{}'", data, index)
-                            ));
+                let response = match message.clone().reply_to_message {
+                    Some(message_or_post) => {
+                        let mut r = String::from("No target message found");
+                        if let MessageOrChannelPost::Message(target_message) = *message_or_post {    
+                            if let MessageKind::Text {ref data, ..} = target_message.kind {
+                                r = format!("I am going to index \n{}\n in '{}'", data, index);
+                            }
                         }
+                        r
                     }
-                }).unwrap_or_else(|| api.spawn(message.text_reply(format!("Not target message found"))));
+                    None => String::from("Not target message found"),
+                };
+                api.spawn(message.text_reply(response));
             }
         }
 
