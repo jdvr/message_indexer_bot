@@ -1,0 +1,12 @@
+version: '3'
+services:
+  message_indexer_bot:
+    environment:
+      - TELEGRAM_BOT_TOKEN
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../:/app:Z
+      - ~/.ssh:/home/root/.ssh:ro
+    command: cargo run

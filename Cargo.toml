@@ -1,0 +1,9 @@
+[package]
+name = "message_indexer_bot"
+version = "0.1.0"
+authors = ["jdvr <juandavidvegarguez@gmail.com>"]
+
+[dependencies]
+telegram-bot = "0.6"
+futures = "0.1.21"
+tokio-core = "0.1.17"
