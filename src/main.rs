@@ -19,18 +19,21 @@ fn main() {
 
     // Fetch new updates via long poll method
     let future = api.stream().for_each(|update| {
-
+        println!("{:?}", update);
         // If the received update contains a new message...
         if let UpdateKind::Message(message) = update.kind {
-
+            
             if let MessageKind::Text {ref data, ..} = message.kind {
-                // Print received text message to stdout.
-                println!("<{}>: {}", &message.from.first_name, data);
-
-                // Answer message with "Hi".
-                api.spawn(message.text_reply(
-                    format!("Hi, {}! You just wrote '{}'", &message.from.first_name, data)
-                ));
+                let index = data;
+                &message.reply_to_message.map(|message_or_post| {
+                    if let MessageOrChannelPost::Message(target_message) = *message_or_post {
+                        if let MessageKind::Text {ref data, ..} = target_message.kind {
+                            api.spawn(message.text_reply(
+                                format!("I am going to index \n{}\n in '{}'", data, index)
+                            ));
+                        }
+                    }
+                }).unwrap_or_else(|| api.spawn(message.text_reply(format!("Not target message found"))));
             }
         }
 
